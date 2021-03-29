@@ -1,4 +1,5 @@
 #include <locale.h>
+#include <fstream>
 #include "sudokuglobals.h"
 #include "viewer.h"
 #include "board.h"
@@ -26,20 +27,23 @@ Control promptForInput() {
 }
 
 void load(Board &board) {
-	FILE *fp = fopen("sudoku.txt", "r");
-	if (!fp) {
+	std::ifstream infile;
+	infile.open("sudoku.txt");
+	if (infile.is_open()) {
+		int arr[numTokens];
+		for (int i = 0; i < numTokens; ++i) {
+			int thisChar;
+			do {
+				thisChar = infile.get();
+			} while (thisChar == '\n' || thisChar == '\r');
+			arr[i] = thisChar;
+		}
+		board.populate(arr);
+		infile.close();
+	} else {
 		printf("File opening failed.\n");
+		return;
 	}
-	int arr[numTokens];
-	for (int i = 0; i < numTokens; ++i) {
-		int thisChar;
-		do {
-			thisChar = fgetc(fp);
-		} while (thisChar == '\n' || thisChar == '\r');
-		arr[i] = thisChar;
-	}
-	board.populate(arr);
-	fclose(fp);
 }
 
 int main(void) {
