@@ -1,6 +1,10 @@
 #include "viewer.h"
 #include "board.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 void Viewer::display()
 {	
 	board->check();
@@ -9,7 +13,7 @@ void Viewer::display()
 	for (int row = 0; row < rows; ++row) {
 		for (int col = 0; col < cols; ++col) {
 			if (col % 3 == 0)
-				printf("\u2502"); // vertical line
+				printf(u8"\u2502"); // vertical line
 			else 
 				printf(" ");
 
@@ -26,7 +30,7 @@ void Viewer::display()
 
 			white();
 		}
-		printf("\u2502\n"); // vertical line
+		printf(u8"\u2502\n"); // vertical line
 		if (row == 2 || row == 5) {
 			printMidLine();
 		}
@@ -60,7 +64,43 @@ char Viewer::mapToNum(Token token)
 	}
 }
 
+#ifdef _WIN32
 void Viewer::black()
+{
+	HANDLE hConsole;
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, 0);
+}
+
+void Viewer::red()
+{
+	HANDLE hConsole;
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, 4);
+}
+
+void Viewer::green()
+{
+	HANDLE hConsole;
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, 2);
+}
+
+void Viewer::white()
+{
+	HANDLE hConsole;
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, 15);
+}
+
+void Viewer::yellow()
+{
+	HANDLE hConsole;
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, 14);
+}
+#else
+	void Viewer::black()
 {
 	printf("\033[0;30m");
 }
@@ -84,10 +124,11 @@ void Viewer::yellow()
 {
 	printf("\033[0;33m");
 }
+#endif
 
 void Viewer::printTopLine()
 {
-	wchar_t topLine[asciiWidth + 1];
+	wchar_t* topLine = new wchar_t[asciiWidth + 1];
 	topLine[0] = 0x250c; // top left corner
 	for (int i = 0; i < 5; ++i) {
 		topLine[i + 1] = 0x2500; // horizontal line
@@ -103,11 +144,12 @@ void Viewer::printTopLine()
 	topLine[18] = 0x2510; // top right corner
 	topLine[19] = 0;
 	printf("\n%ls\n", topLine);
+	delete [] topLine;
 }
 
 void Viewer::printBottomLine()
 {
-	wchar_t bottomLine[asciiWidth + 1];
+	wchar_t* bottomLine = new wchar_t[asciiWidth + 1];
 	bottomLine[0] = 0x2514; // bottom left corner
 	for (int i = 0; i < 5; ++i) {
 		bottomLine[i + 1] = 0x2500; // horizontal line
@@ -123,11 +165,12 @@ void Viewer::printBottomLine()
 	bottomLine[18] = 0x2518; // bottom right corner
 	bottomLine[19] = 0;
 	printf("%ls\n", bottomLine);
+	delete [] bottomLine;
 }
 
 void Viewer::printMidLine()
 {
-	wchar_t midLine[asciiWidth + 1];
+	wchar_t* midLine = new wchar_t[asciiWidth + 1];
 	midLine[0] = 0x251c; // cell separator on left border
 	for (int i = 0; i < 5; ++i) {
 		midLine[i + 1] = 0x2500; // horizontal line
@@ -143,4 +186,5 @@ void Viewer::printMidLine()
 	midLine[18] = 0x2524; // cell separator on right border
 	midLine[19] = 0;
 	printf("%ls\n", midLine);
+	delete [] midLine;
 }

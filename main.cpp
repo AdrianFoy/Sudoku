@@ -43,7 +43,11 @@ void load(Board &board) {
 }
 
 int main(void) {
+	#ifdef _WIN32
+	setlocale(LC_ALL, ".utf8");
+	#else
 	setlocale(LC_ALL, "C.UTF-8");
+	#endif
 	Board board;
 	Viewer viewer(board);
 
